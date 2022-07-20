@@ -12,11 +12,6 @@ public class IconSelected : MonoBehaviour
 
     public string passwordToEdit = "My Password";
 
-    void OnGUI()
-    {
-        passwordToEdit = GUI.PasswordField(new Rect(10, 10, 200, 20), passwordToEdit, "*"[0], 25);
-    }
-
     // Start is called before the first frame update
     void Start()
     {
