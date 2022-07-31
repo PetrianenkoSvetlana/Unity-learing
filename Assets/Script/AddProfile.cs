@@ -12,72 +12,28 @@ using UnityEditor;
 using System.Runtime.InteropServices;
 using UnityEngine.Networking;
 using SFB;
-
-[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-public class OpenFileName
-{
-    public int structSize = 0;
-    public IntPtr dlgOwner = IntPtr.Zero;
-    public IntPtr instance = IntPtr.Zero;
-    public String filter = null;
-    public String customFilter = null;
-    public int maxCustFilter = 0;
-    public int filterIndex = 0;
-    public String file = null;
-    public int maxFile = 0;
-    public String fileTitle = null;
-    public int maxFileTitle = 0;
-    public String initialDir = null;
-    public String title = null;
-    public int flags = 0;
-    public short fileOffset = 0;
-    public short fileExtension = 0;
-    public String defExt = null;
-    public IntPtr custData = IntPtr.Zero;
-    public IntPtr hook = IntPtr.Zero;
-    public String templateName = null;
-    public IntPtr reservedPtr = IntPtr.Zero;
-    public int reservedInt = 0;
-    public int flagsEx = 0;
-    public OpenFileName(int FileLenth = 256, int FileTitleLenth = 64)
-    {
-        structSize = Marshal.SizeOf(this);
-        file = new string(new char[FileLenth]);
-        maxFile = file.Length;
-        fileTitle = new string(new char[FileTitleLenth]);
-        maxFileTitle = fileTitle.Length;
-        title = String.Empty;
-        flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000008;
-        title = "Заголовок окна";
-        initialDir = Application.dataPath.Replace('/', '\\');
-    }
-}
-
-public class LocalDialog
-{
-    [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto)]
-    public static extern bool GetOpenFileName([In, Out] OpenFileName ofn);
-    [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto)]
-    public static extern bool GetSaveFileName([In, Out] OpenFileName ofn);
-}
+using System.Text.RegularExpressions;
+using UnityEngine.EventSystems;
 
 [Serializable]
 public class Profile
 {
-    public string nameIcon;
-    public string nameProfile;
-    public string passwordProfile;
-    public string pathProfile;
+    public string icon;
+    public string name;
+    public string password;
+    public string email;
+    public string path;
 
-    public Profile(string nameIcon, string nameProfile, string passwordProfile, string pathProfile)
+    public Profile(string icon, string name, string password, string email, string path)
     {
-        this.nameIcon = nameIcon;
-        this.nameProfile = nameProfile;
+        this.icon = icon;
+        this.name = name;
 
         var hash = new Hash128();
-        hash.Append(passwordProfile);
-        this.passwordProfile = hash.ToString();
-        this.pathProfile = pathProfile;
+        hash.Append(password);
+        this.password = hash.ToString();
+        this.email = email;
+        this.path = path;
     }
 }
 
@@ -89,42 +45,40 @@ public class Profiles
 
 public class AddProfile : MonoBehaviour
 {
+    [Header("Full Input")]
+    public GameObject inputName;
+    public GameObject inputEmail;
+
+    [Header("Input")]
+    public GameObject inputPassword;
+    public GameObject inputPath;
+
+    [Space(10f)]
+    public GameObject canvas;
+    public Sprite[] icons;
     [SerializeField]
     private GameObject iconGameObject;
 
-    //public GameObject icon;
-    public GameObject inputName;
-    public GameObject inputPassword;
-    public GameObject inputPath;
-    public GameObject warningText;
-    public Sprite[] icons;
-
     private InputField textName;
+    private InputField textEmail;
     private InputField textPassword;
     private InputField textPath;
 
-    private string pathSaveData;
+    //private string pathSaveData;
     private int index = 0;
-    private Profiles profiles = new Profiles();
+    private Profiles profiles;
 
-    void Start()
+    private void OnEnable()
     {
-        pathSaveData = Application.persistentDataPath + "/SaveData.dat";
+        profiles = canvas.GetComponent<LoadProfile>().data;
+
         textName = inputName.GetComponentInChildren<InputField>();
+        textEmail = inputEmail.GetComponentInChildren<InputField>();
+
         textPassword = inputPassword.GetComponent<InputField>();
         textPath = inputPath.GetComponent<InputField>();
-
-        if (File.Exists(pathSaveData))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(pathSaveData, FileMode.Open);
-            profiles = (Profiles)bf.Deserialize(file);
-            file.Close();
-        }
-
-        iconGameObject.transform.GetChild(1).GetComponent<Image>().sprite = icons[index];
-
-        inputPath.transform.GetChild(0).GetComponent<Text>().text = Application.dataPath;
+    
+        textPath.text = Application.dataPath;
     }
 
     /// <summary>
@@ -132,25 +86,33 @@ public class AddProfile : MonoBehaviour
     /// </summary>
     public void Add()
     {
-        if (textName.text == "")
-        {
-            var rectTransf = inputName.GetComponent<RectTransform>();
-            var sizeDelta = rectTransf.sizeDelta;
-            rectTransf.sizeDelta = new Vector2(sizeDelta.x, 73);
-            warningText.SetActive(true);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(transform.GetChild(1).GetComponent<RectTransform>());
-        }
-        else
+        bool error = false;
+
+        error |= inputName.GetComponent<CheckingInput>().Checking(textName.text != "");
+
+        bool isEmail = Regex.IsMatch(textEmail.text, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
+        error |= inputEmail.GetComponent<CheckingInput>().Checking(isEmail);
+
+        //if (textName.text == "")
+        //{
+        //var rectTransf = inputName.GetComponent<RectTransform>();
+        //var sizeDelta = rectTransf.sizeDelta;
+        //rectTransf.sizeDelta = new Vector2(sizeDelta.x, 55);
+        //warningText.SetActive(true);
+        //LayoutRebuilder.ForceRebuildLayoutImmediate(transform.GetChild(1).GetComponent<RectTransform>());
+        //}
+        if (!error)
         {
             BinaryFormatter bf = new BinaryFormatter();
-            profiles.profiles.Add(new Profile(icons[index].name, textName.text, textPassword.text, textPath.text));
-            FileStream file = File.Open(pathSaveData, FileMode.OpenOrCreate);
+            profiles.profiles.Add(new Profile(icons[index].name, textName.text, textPassword.text, textEmail.text, textPath.text));
+            FileStream file = File.Open(LoadProfile.pathSaveData, FileMode.OpenOrCreate);
             bf.Serialize(file, profiles);
             file.Close();
-            CurrentProfile.nameIcon = profiles.profiles.Last().nameIcon;
-            CurrentProfile.name = profiles.profiles.Last().nameProfile;
-            CurrentProfile.password = profiles.profiles.Last().passwordProfile;
-            CurrentProfile.path = profiles.profiles.Last().pathProfile;
+            CurrentProfile.icon = profiles.profiles.Last().icon;
+            CurrentProfile.name = profiles.profiles.Last().name;
+            CurrentProfile.password = profiles.profiles.Last().password;
+            CurrentProfile.email = profiles.profiles.Last().email;
+            CurrentProfile.path = profiles.profiles.Last().path;
 
             System.IO.Directory.CreateDirectory(CurrentProfile.path + "/" + CurrentProfile.name);
 
@@ -168,7 +130,7 @@ public class AddProfile : MonoBehaviour
         //    Debug.Log(openFileName.fileTitle);
         //};
         var path = StandaloneFileBrowser.OpenFolderPanel("Выберить путь для сохрания ваших проектов", "", false);
-        textPath.text = path.Length != 0 ? path[0] : "";
+        textPath.text = path.Length != 0 ? path[0] : textPath.text;
 
         //textPath.text = EditorUtility.OpenFolderPanel("Выберить путь", Application.dataPath, "");
     }
@@ -179,7 +141,9 @@ public class AddProfile : MonoBehaviour
         {
             var request = UnityWebRequestTexture.GetTexture(url[0]);
             yield return request.SendWebRequest();
-            response(DownloadHandlerTexture.GetContent(request));
+            var texture = DownloadHandlerTexture.GetContent(request);
+            texture.name = url[0];
+            response(texture);
             request.Dispose();
         }
         else
@@ -189,7 +153,7 @@ public class AddProfile : MonoBehaviour
 
     public void AddPathIcon()
     {
-        if (icons[index].name != "default")
+        if (index < icons.Length - 1)
             return;
         //textPath.text = 
         var extensions = new[] {
@@ -197,10 +161,7 @@ public class AddProfile : MonoBehaviour
             new ExtensionFilter("All Files", "*" ),
         };
         var pathIcon = StandaloneFileBrowser.OpenFilePanel("Выберите иконку для профиля", "", extensions, false);
-        //string pathIcon = EditorUtility.OpenFilePanelWithFilters("Выберить путь", "", new string[] { "Image files", "png,jpg,jpeg", "All files", "*" });
         StartCoroutine(LoadTextureFromServer(pathIcon, LoadTexture));
-
-        //var texture = DownloadHandlerTexture.GetContent(UnityWebRequestTexture.GetTexture(pathIcon));
 
     }
 
@@ -209,7 +170,8 @@ public class AddProfile : MonoBehaviour
         if (texture == null)
             return;
         var sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
-        sprite.name = "default";
+        
+        sprite.name = texture.name;
         icons[^1] = sprite;
         iconGameObject.transform.GetChild(0).GetComponent<Image>().sprite = icons.Last();
         iconGameObject.transform.GetChild(2).GetComponent<Image>().sprite = icons.Last();
@@ -237,10 +199,20 @@ public class AddProfile : MonoBehaviour
         iconGameObject.transform.DOLocalMoveX(160, 0.5f).Restart();
     }
 
-    public void Back()
+    public void UnactiveWindow()
     {
-        SceneManager.LoadScene("SampleScene");
+        //RectTransform[] rectTransforms = GetComponentsInChildren<RectTransform>();
+        //foreach (RectTransform rectTransform in rectTransforms)
+        //{
+        //    if (EventSystem.current.currentSelectedGameObject == rectTransform.gameObject)
+        //    {
+        //        gameObject.SetActive(false);
+        //    };
+        //}
+        RectTransform rectTransform = GetComponent<RectTransform>();
+        if (EventSystem.current.currentSelectedGameObject == rectTransform.gameObject)
+        {
+            gameObject.SetActive(false);
+        };
     }
-
-
 }

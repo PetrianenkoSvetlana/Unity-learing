@@ -11,8 +11,7 @@ public class HoverProfile : MonoBehaviour
 
     private void Start()
     {
-        var asd = transform;
-        iconDelete.GetComponent<Button>().onClick.AddListener(() => gameObject.GetComponentInParent<LoadProfile>().ActiveDeleteWindow(gameObject.name));
+        //iconDelete.GetComponent<Button>().onClick.AddListener(() => gameObject.GetComponentInParent<LoadProfile>().ActiveDeleteWindow(gameObject.name));
     }
 
     private void OnMouseEnter()

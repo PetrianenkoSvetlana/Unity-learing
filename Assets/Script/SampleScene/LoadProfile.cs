@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -16,65 +18,84 @@ public class LoadProfile : MonoBehaviour
     [SerializeField]
     private GameObject content;
     [SerializeField]
-    private GameObject deleteWindow;
-    [SerializeField]
-    private GameObject deleteButton;
-    [SerializeField]
-    private GameObject passwordInput; 
-    [SerializeField]
-    private GameObject warningText;
+    private GameObject windowAddProfile;
 
-    private Profiles data;
-    private string pathSaveData;
+    //[SerializeField]
+    //private GameObject deleteWindow;
+    //[SerializeField]
+    //private GameObject deleteButton;
+    //[SerializeField]
+    //private GameObject passwordInput; 
+    //[SerializeField]
+    //private GameObject warningText;
 
-    void Start()
+    [HideInInspector]
+    public Profiles data; 
+    public static string pathSaveData;
+
+    private void Awake()
     {
-
         pathSaveData = Application.persistentDataPath + "/SaveData.dat";
         LoadData();
     }
-
-    public void LoadScene()
+    void Start()
     {
-        SceneManager.LoadScene("NewProfile");
-    }
 
-    public void ActiveDeleteWindow(string name)
-    {
-        warningText.SetActive(false);
-        passwordInput.GetComponent<InputField>().text = "";
-        deleteWindow.SetActive(true);
-        deleteButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        deleteButton.GetComponent<Button>().onClick.AddListener(() => DeleteProfile(name));
-    }
-
-    public void UnactiveDeleteWindow()
-    {
-        deleteWindow.SetActive(false);
-    }
-
-    public void DeleteProfile(string name)
-    {
-        var password = passwordInput.GetComponent<InputField>().text;
-        var hash = new Hash128();
-        hash.Append(password);
-
-        if (hash.ToString() == data.profiles[int.Parse(name)].passwordProfile)
-        {
-            data.profiles.RemoveAt(int.Parse(name));
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(pathSaveData, FileMode.OpenOrCreate);
-            bf.Serialize(file, data);
-            file.Close();
-            LoadData();
-            deleteWindow.SetActive(false);
-        }
-        else
-        {
-            warningText.SetActive(true);
-            passwordInput.GetComponent<InputField>().text = "";
-        }
         
+    }
+
+    public void ActiveAddProfileWindow()
+    {
+        windowAddProfile.SetActive(true);
+    }
+
+    //public void ActiveDeleteWindow(string name)
+    //{
+    //    warningText.SetActive(false);
+    //    passwordInput.GetComponent<InputField>().text = "";
+    //    deleteWindow.SetActive(true);
+    //    deleteButton.GetComponent<Button>().onClick.RemoveAllListeners();
+    //    deleteButton.GetComponent<Button>().onClick.AddListener(() => DeleteProfile(name));
+    //}
+
+    //public void UnactiveDeleteWindow()
+    //{
+    //    deleteWindow.SetActive(false);
+    //}
+
+    //public void DeleteProfile(string name)
+    //{
+    //    var password = passwordInput.GetComponent<InputField>().text;
+    //    var hash = new Hash128();
+    //    hash.Append(password);
+
+    //    if (hash.ToString() == data.profiles[int.Parse(name)].password)
+    //    {
+    //        data.profiles.RemoveAt(int.Parse(name));
+    //        BinaryFormatter bf = new BinaryFormatter();
+    //        FileStream file = File.Open(pathSaveData, FileMode.OpenOrCreate);
+    //        bf.Serialize(file, data);
+    //        file.Close();
+    //        LoadData();
+    //        deleteWindow.SetActive(false);
+    //    }
+    //    else
+    //    {
+    //        warningText.SetActive(true);
+    //        passwordInput.GetComponent<InputField>().text = "";
+    //    }
+        
+    //}
+
+    IEnumerator LoadTextureFromServer(string url, GameObject profileObj)
+    {
+        var request = UnityWebRequestTexture.GetTexture(url);
+        yield return request.SendWebRequest();
+        var texture = DownloadHandlerTexture.GetContent(request);
+        var sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
+        profileObj.transform.GetChild(0).GetComponent<Image>().sprite = sprite;
+        request.Dispose();
+
     }
 
     private void LoadData()
@@ -95,8 +116,14 @@ public class LoadProfile : MonoBehaviour
             {
                 var profileObj = Instantiate(prefabProfile);
                 profileObj.name = numberProfile.ToString();
-                profileObj.transform.GetChild(0).GetComponent<Image>().sprite = Resources.Load<Sprite>(profile.nameIcon);
-                profileObj.GetComponentInChildren<Text>().text = profile.nameProfile;
+                if (profile.icon.Length < 6)
+                {
+                    profileObj.transform.GetChild(0).GetComponent<Image>().sprite = Resources.Load<Sprite>(profile.icon);
+                }
+                else {
+                    StartCoroutine(LoadTextureFromServer(profile.icon, profileObj));
+                }
+                profileObj.GetComponentInChildren<Text>().text = profile.name;
                 profileObj.transform.SetParent(content.transform, false);
                 numberProfile++;
             }
@@ -116,3 +143,5 @@ public class LoadProfile : MonoBehaviour
     }
 
 }
+
+

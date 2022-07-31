@@ -9,7 +9,7 @@ public class AllCourses : MonoBehaviour
     private GameObject icon;
     void Start()
     {
-        icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(CurrentProfile.nameIcon);
+        icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(CurrentProfile.icon);
         icon.GetComponentInChildren<Text>().text = CurrentProfile.name;
 
     }
