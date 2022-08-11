@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: 
     guid: 00000000000000000000000000000000
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/MainScene.unity
     guid: ad2d48fb3eff81d47a0e3ad5e5e1494a
   - enabled: 1
     path: Assets/Scenes/NewProfile.unity
@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: "Assets/Scenes/All\u0421ourses.unity"
     guid: b2be486e2048500428f1f60534cc273b
+  - enabled: 1
+    path: Assets/Scenes/ProfileCourses.unity
+    guid: 533c6df249f8ca84bbeb45f3e95dc027
+  - enabled: 1
+    path: Assets/Scenes/Course.unity
+    guid: 85ddf27bbe5f0eb4e9384a492145d58d
   m_configObjects: {}
