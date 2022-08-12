@@ -1,11 +1,13 @@
 using DG.Tweening;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
-
+using YoutubeExtractor;
 
 public class Video : MonoBehaviour
 {
@@ -64,7 +66,6 @@ public class Video : MonoBehaviour
     private Vector3 positionCursor;
     private BoxCollider2D boxCollider;
 
-    // Start is called before the first frame update
     void Start()
     {
         windowLoading.SetActive(true);
@@ -74,9 +75,16 @@ public class Video : MonoBehaviour
         vPlayer.Prepare();
         //vPlayer.
         vPlayer.prepareCompleted += OnPrepareFinished;
+        vPlayer.started += OnStarted;
         volume.sliderVolume.onValueChanged.AddListener(value => ChangeAudio2(value));
         //vPlayer.frameReady += OnFrameReady;
     }
+
+    private void OnStarted(VideoPlayer source)
+    {
+        print("Ыефке");
+    }
+
     private void Update()
     {
         var time = vPlayer.time;
@@ -153,12 +161,13 @@ public class Video : MonoBehaviour
         {
             vPlayer.Pause();
             playOrPause.button.sprite = playOrPause.play;
-
+            spritePlayOrPause.sprite = playOrPause.pause;
         }
         else
         {
             vPlayer.Play();
             playOrPause.button.sprite = playOrPause.pause;
+            spritePlayOrPause.sprite = playOrPause.play;
         }
     }
     /// <summary>
@@ -186,16 +195,7 @@ public class Video : MonoBehaviour
     }
     public void ClickOnScreen()
     {
-        if (vPlayer.isPlaying)
-        {
-            vPlayer.Pause();
-            spritePlayOrPause.sprite = playOrPause.pause;
-        }
-        else
-        {
-            vPlayer.Play();
-            spritePlayOrPause.sprite = playOrPause.play;
-        }
+        OnClick();
         Sequence sequences = DOTween.Sequence();
         sequences.Append(playOrPause._object.transform.DOScale(new Vector3(1f, 1f), .1f).From()).
             Append(spritePlayOrPause.DOFade(1, .1f).From()).
