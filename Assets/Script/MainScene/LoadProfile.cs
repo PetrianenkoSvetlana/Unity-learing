@@ -116,7 +116,7 @@ public class LoadProfile : MonoBehaviour
 
     private void Auth(Profile profile, Sprite sprite)
     {
-        print(profile);
+        //print(profile);
         authProfile.profile = profile;
         authProfile.icon = sprite;
         windowAuthProfile.SetActive(true);

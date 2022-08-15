@@ -48,7 +48,7 @@ public class AddProfile : MonoBehaviour
         textPassword = inputPassword.GetComponent<InputField>();
         textPath = inputPath.GetComponent<InputField>();
     
-        textPath.text = Application.dataPath;
+        textPath.text = Application.streamingAssetsPath;
 
     }
 

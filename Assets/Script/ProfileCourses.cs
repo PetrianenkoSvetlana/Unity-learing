@@ -28,7 +28,7 @@ public class ProfileCourses : MonoBehaviour
 
         var courseTest = new MyCourse();
         courseTest.name = "Мой первый курс";
-        courseTest.lessons = new MyLesson[4];
+        courseTest.lessons = new MyLesson[6];
         //courseTest.lastLesson = courseTest.lessons[2];
         courseTest.lessons[0] = new MyLesson();
         courseTest.lessons[0].finish = true;
@@ -37,6 +37,8 @@ public class ProfileCourses : MonoBehaviour
         courseTest.lessons[2] = new MyLesson();
         courseTest.lessons[2].name = "3. Вроде как третий урок";
         courseTest.lessons[3] = new MyLesson();
+        courseTest.lessons[4] = new MyLesson();
+        courseTest.lessons[5] = new MyLesson();
 
         /*********************************/
         /* Нужно заменить */
