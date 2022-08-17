@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -9,7 +10,7 @@ public class Profile
     private string password;
     private string email;
     private string path;
-
+    private List<MyCourse> courses = new List<MyCourse>();
 
     public string Icon
     {
@@ -35,6 +36,12 @@ public class Profile
     {
         get { return path; }
         set { path = value; }
+    }
+
+    public List<MyCourse> Courses
+    {
+        get { return courses; }
+        set { courses = value; }
     }
     public Profile(string icon, string name, string password, string email, string path)
     {

@@ -35,7 +35,9 @@ public class AuthProfile : MonoBehaviour
             CurrentProfile.password = profile.Password;
             CurrentProfile.email = profile.Email;
             CurrentProfile.path = profile.Path;
-            SceneManager.LoadScene("ProfileCourses");
+            CurrentProfile.courses = profile.Courses;
+            SceneManager.LoadScene("All—ourses");
+            //SceneManager.LoadScene("ProfileCourses");
         }
     }
 }
