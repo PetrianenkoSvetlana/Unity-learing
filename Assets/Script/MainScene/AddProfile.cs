@@ -23,7 +23,8 @@ public class AddProfile : MonoBehaviour
     public GameObject inputPath;
 
     [Space(10f)]
-    public LoadProfile loadProfile;
+    [SerializeField]
+    private ObjectProfiles objectProfiles;
     public Sprite[] icons;
     [SerializeField]
     private GameObject iconGameObject;
@@ -33,15 +34,10 @@ public class AddProfile : MonoBehaviour
     private InputField textPassword;
     private InputField textPath;
 
-    //private string pathSaveData;
     private int index = 0;
-    private List<Profile> profiles;
 
     private void OnEnable()
     {
-        //profiles = canvas.GetComponent<LoadProfile>().data;
-        profiles = loadProfile.profiles;
-
         textName = inputName.GetComponentInChildren<InputField>();
         textEmail = inputEmail.GetComponentInChildren<InputField>();
 
@@ -66,19 +62,16 @@ public class AddProfile : MonoBehaviour
 
         if (!error)
         {
-            BinaryFormatter bf = new BinaryFormatter();
-            profiles.Add(new Profile(icons[index].name, textName.text, textPassword.text, textEmail.text, textPath.text));
-            FileStream file = File.Open(LoadProfile.pathSaveData, FileMode.OpenOrCreate);
-            bf.Serialize(file, profiles);
-            file.Close();
+            Profile newProfile = new Profile(icons[index].name, textName.text, textPassword.text, textEmail.text, textPath.text);
+            objectProfiles.AddProfile(newProfile);
 
             CurrentProfile.icon = icons[index];
-            CurrentProfile.name = profiles.Last().Name;
-            CurrentProfile.password = profiles.Last().Password;
-            CurrentProfile.email = profiles.Last().Email;
-            CurrentProfile.path = profiles.Last().Path;
+            CurrentProfile.name = newProfile.Name;
+            CurrentProfile.password = newProfile.Password;
+            CurrentProfile.email = newProfile.Email;
+            CurrentProfile.path = newProfile.Path;
 
-            Directory.CreateDirectory(CurrentProfile.path + "/" + CurrentProfile.name);
+            Directory.CreateDirectory(Path.Combine(CurrentProfile.path, CurrentProfile.name));
 
             SceneManager.LoadScene("All—ourses");
         }

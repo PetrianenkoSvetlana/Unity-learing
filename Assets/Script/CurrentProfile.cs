@@ -9,5 +9,6 @@ static public class CurrentProfile
     static public string password;
     static public string email;
     static public string path;
-    static public List<string> courses;
+    static public List<MyCourse> courses = new List<MyCourse>();
+    static public MyCourse currentCourse;
 }

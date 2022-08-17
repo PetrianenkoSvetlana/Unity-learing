@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
@@ -19,31 +20,22 @@ public class LoadProfile : MonoBehaviour
     [SerializeField]
     private GameObject windowAuthProfile;
 
-    [HideInInspector]
-    public List<Profile> profiles; 
-    public static string pathSaveData;
+    [SerializeField]
+    private ObjectProfiles objectProfiles;
 
     private AuthProfile authProfile;
 
     private void Awake()
     {
-        pathSaveData = Application.persistentDataPath + "/SaveData.dat";
         authProfile = windowAuthProfile.GetComponentInChildren<AuthProfile>();
         LoadData();
     }
     private void LoadData()
     {
-        if (File.Exists(pathSaveData))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(pathSaveData, FileMode.Open);
-            profiles = (List<Profile>)bf.Deserialize(file);
-            file.Close();
-
-            //foreach (Transform child in content.transform)
-            //    Destroy(child.gameObject);
-
-            foreach (var profile in profiles)
+        objectProfiles.LoadData();
+        //foreach (Transform child in content.transform)
+        //    Destroy(child.gameObject);
+        foreach (var profile in objectProfiles.Profiles)
             {
                 var profileObj = Instantiate(prefabProfile);
                 Sprite iconProfile = Resources.Load<Sprite>("Icons/" + profile.Icon);
@@ -58,7 +50,6 @@ public class LoadProfile : MonoBehaviour
                 profileObj.GetComponentInChildren<Text>().text = profile.Name;
                 profileObj.transform.SetParent(content.transform, false);
             }
-        }
         StartCoroutine(ChangeSize());
     }
 
@@ -69,11 +60,6 @@ public class LoadProfile : MonoBehaviour
     //    deleteWindow.SetActive(true);
     //    deleteButton.GetComponent<Button>().onClick.RemoveAllListeners();
     //    deleteButton.GetComponent<Button>().onClick.AddListener(() => DeleteProfile(name));
-    //}
-
-    //public void UnactiveDeleteWindow()
-    //{
-    //    deleteWindow.SetActive(false);
     //}
 
     //public void DeleteProfile(string name)
@@ -116,7 +102,6 @@ public class LoadProfile : MonoBehaviour
 
     private void Auth(Profile profile, Sprite sprite)
     {
-        //print(profile);
         authProfile.profile = profile;
         authProfile.icon = sprite;
         windowAuthProfile.SetActive(true);
