@@ -56,6 +56,10 @@ public class Video : MonoBehaviour
     private VideoPlayer vPlayer;
     [SerializeField]
     private Slider sliderVideo;
+    [SerializeField]
+    private GameObject viewPort;
+    [SerializeField]
+    private GameObject titleLesson;
 
     private bool scaling = false;
     private float volumeValue;
@@ -178,6 +182,8 @@ public class Video : MonoBehaviour
         if (!scaling)
         {
             rect = rectTransform.rect;
+            viewPort.GetComponent<Mask>().enabled = false;
+            titleLesson.SetActive(false);
             Sequence sequenceScaling = DOTween.Sequence();
             sequenceScaling.Append(rectTransform.DOMove(transform.localPosition, .5f)).
                 Insert(0, rectTransform.DOSizeDelta(new Vector2(1366, 768), .5f)).OnComplete(() => scaling = !scaling);
@@ -186,6 +192,8 @@ public class Video : MonoBehaviour
         }
         else
         {
+            viewPort.GetComponent<Mask>().enabled = true;
+            titleLesson.SetActive(true);
             Sequence sequenceNormal = DOTween.Sequence();
             sequenceNormal.Append(rectTransform.DOLocalMove(Vector2.zero, .5f)).
                 Insert(0, rectTransform.DOSizeDelta(rect.size, .5f)).OnComplete(() => scaling = !scaling);
