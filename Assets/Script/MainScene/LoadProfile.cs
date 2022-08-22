@@ -36,20 +36,20 @@ public class LoadProfile : MonoBehaviour
         //foreach (Transform child in content.transform)
         //    Destroy(child.gameObject);
         foreach (var profile in objectProfiles.Profiles)
+        {
+            var profileObj = Instantiate(prefabProfile);
+            Sprite iconProfile = Resources.Load<Sprite>("Icons/" + profile.Icon);
+            if (iconProfile.IsUnityNull())
             {
-                var profileObj = Instantiate(prefabProfile);
-                Sprite iconProfile = Resources.Load<Sprite>("Icons/" + profile.Icon);
-                if (iconProfile.IsUnityNull())
-                {
-                    StartCoroutine(LoadTextureFromServer(profile.Icon, profileObj, profile));
-                }
-                else
-                {
-                    SetSprite(profileObj, iconProfile, profile);
-                }
-                profileObj.GetComponentInChildren<Text>().text = profile.Name;
-                profileObj.transform.SetParent(content.transform, false);
+                StartCoroutine(LoadTextureFromServer(profile.Icon, profileObj, profile));
             }
+            else
+            {
+                SetSprite(profileObj, iconProfile, profile);
+            }
+            profileObj.GetComponentInChildren<Text>().text = profile.Name;
+            profileObj.transform.SetParent(content.transform, false);
+        }
         StartCoroutine(ChangeSize());
     }
 

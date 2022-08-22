@@ -7,7 +7,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
-using YoutubeExtractor;
 
 public class Video : MonoBehaviour
 {
@@ -72,21 +71,15 @@ public class Video : MonoBehaviour
 
     void Start()
     {
-        windowLoading.SetActive(true);
+        //windowLoading.SetActive(true);
         rectTransform = GetComponent<RectTransform>();
         boxCollider = GetComponentInChildren<BoxCollider2D>();
         spritePlayOrPause = playOrPause._object.GetComponent<Image>();
         vPlayer.Prepare();
         //vPlayer.
         vPlayer.prepareCompleted += OnPrepareFinished;
-        vPlayer.started += OnStarted;
         volume.sliderVolume.onValueChanged.AddListener(value => ChangeAudio2(value));
         //vPlayer.frameReady += OnFrameReady;
-    }
-
-    private void OnStarted(VideoPlayer source)
-    {
-        print("Ыефке");
     }
 
     private void Update()
@@ -105,7 +98,6 @@ public class Video : MonoBehaviour
 
     void OnPrepareFinished(VideoPlayer player)
     {
-
         sliderVideo.maxValue = vPlayer.frameCount / vPlayer.frameRate;
         var time = sliderVideo.maxValue;
         var hour = (int)time / 60 / 60;

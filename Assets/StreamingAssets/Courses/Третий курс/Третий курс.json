@@ -6,22 +6,22 @@
     {
       "title": "Урок 1. Первый урок",
       "description": "Тут должно расcказываться, что нужно делать",
-      "video": null
+      "url": "https://gbcdn.mrgcdn.ru/uploads/record/131040/attachment/1e53158708ba3e668bb1751c8203a362.mp4"
     },
     {
       "title": "Урок 2. Второй урок",
       "description": "Тут тоже должно расcказываться, что нужно делать",
-      "video": null
+      "url": null
     },
     {
       "title": "Урок 3. Третий урок",
       "description": "Тут тоже должно расcказываться, что нужно делать",
-      "video": null
+      "url": null
     },
     {
       "title": "Урок 4. Четвёртый урок",
       "description": "Тут тоже должно расcказываться, что нужно делать",
-      "video": null
+      "url": null
     }
   ]
 }
