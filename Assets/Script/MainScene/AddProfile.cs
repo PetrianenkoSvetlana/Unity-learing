@@ -70,8 +70,17 @@ public class AddProfile : MonoBehaviour
             CurrentProfile.password = newProfile.Password;
             CurrentProfile.email = newProfile.Email;
             CurrentProfile.path = newProfile.Path;
+            CurrentProfile.courses = new List<MyCourse>();
 
-            Directory.CreateDirectory(Path.Combine(CurrentProfile.path, CurrentProfile.name));
+            if (Directory.Exists(CurrentProfile.path))
+            {
+                int number = 2;
+                while (Directory.Exists(CurrentProfile.path + $" ({number})"))
+                    number++;
+                Directory.CreateDirectory(CurrentProfile.path + $" ({number})");
+            }
+            else
+                Directory.CreateDirectory(CurrentProfile.path);
 
             SceneManager.LoadScene("All—ourses");
         }

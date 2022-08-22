@@ -14,10 +14,12 @@ public class AuthProfile : MonoBehaviour
     [SerializeField]
     private GameObject inputPassword;
 
+    private ObjectProfiles objectProfiles;
 
     private InputField textPassword;
     private void OnEnable()
     {
+        objectProfiles = FindObjectOfType<ObjectProfiles>();
         textPassword = inputPassword.GetComponentInChildren<InputField>();
     }
 
@@ -36,8 +38,9 @@ public class AuthProfile : MonoBehaviour
             CurrentProfile.email = profile.Email;
             CurrentProfile.path = profile.Path;
             CurrentProfile.courses = profile.Courses;
-            SceneManager.LoadScene("All—ourses");
+            SceneManager.LoadScene("ProfileCourses");
             //SceneManager.LoadScene("ProfileCourses");
         }
+
     }
 }

@@ -52,6 +52,6 @@ public class Profile
         hash.Append(password);
         this.password = hash.ToString();
         this.email = email;
-        this.path = path;
+        this.path = System.IO.Path.Combine(path, name);
     }
 }

@@ -17,7 +17,7 @@ public class ObjectProfiles : MonoBehaviour
 
     private void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
         pathSaveData = Application.persistentDataPath + "/SaveData.dat";
         LoadData();
     }
@@ -59,6 +59,19 @@ public class ObjectProfiles : MonoBehaviour
     {
         var profile = profiles.Find(x => x.Path == CurrentProfile.path);
         profile.Courses.Add(new MyCourse(course));
+        SaveData();
+    }
+
+    public void AddCourse(MyCourse course)
+    {
+        var profile = profiles.Find(x => x.Path == CurrentProfile.path);
+        profile.Courses.Add(course);
+        SaveData();
+    }
+
+    public void DeleteProfile(Profile profile)
+    {
+        profiles.Remove(profile);
         SaveData();
     }
 }

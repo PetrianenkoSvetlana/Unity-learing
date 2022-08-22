@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class AllCourses : MonoBehaviour
@@ -25,113 +26,92 @@ public class AllCourses : MonoBehaviour
     [SerializeField]
     private InputField inputSearch;
     private ObjectProfiles objectProfiles;
-    private List<GameObject> listCourse = new List<GameObject>();
+    private readonly List<GameObject> listCourse = new List<GameObject>();
     private void Awake()
     {
         objectProfiles = FindObjectOfType<ObjectProfiles>();
 
         DirectoryInfo dir = new DirectoryInfo(Path.Combine(Application.streamingAssetsPath, "Courses"));
-        foreach (var folder in dir.GetDirectories())
+        foreach (var (folder, file) in dir.GetDirectories().SelectMany(folder => folder.GetFiles().Where(file => file.Extension == ".json").Select(file => (folder, file))))
         {
-            foreach (var file in folder.GetFiles())
+            string jsonString = File.ReadAllText(file.FullName);
+            var course = JsonUtility.FromJson<Course>(jsonString);
+            course.pathIcon = Path.Combine(folder.FullName, course.pathIcon);
+            GameObject objCard = null;
+            if (CurrentProfile.courses.Exists(x => x.title.Contains(course.title)))
             {
-                if (file.Extension == ".json")
+                var myCourse = CurrentProfile.courses.Find(x => x.title.Contains(course.title));
+                /* Если курс уже прошли */
+                if (myCourse.finish)
                 {
-                    string jsonString = File.ReadAllText(file.FullName);
-                    var course = JsonUtility.FromJson<Course>(jsonString);
-
-                    if (CurrentProfile.courses.Exists(x => x.title.Contains(course.title)))
-                    {
-                        var myCourse = CurrentProfile.courses.Find(x => x.title.Contains(course.title));
-                        /* Если курс уже прошли */
-                        if (myCourse.finish)
-                        {
-                            var objCardStart = Instantiate(cardComplite);
-                            StartCoroutine(LoadTextureFromServer(Path.Combine(folder.FullName, course.pathIcon), objCardStart, course));
-                            var infoCourse = objCardStart.transform.GetChild(1);
-                            infoCourse.GetChild(0).GetComponentInChildren<Text>().text = course.title;
-                            infoCourse.GetChild(1).GetComponentInChildren<Text>().text = course.lessons.Count.ToString() + " уроков";
-                            objCardStart.transform.SetParent(content.transform, false);
-                            objCardStart.transform.GetChild(2).GetComponentInChildren<Button>().onClick.AddListener(() => CurrentProfile.currentCourse = new MyCourse(course));
-                            listCourse.Add(objCardStart);
-                        }
-                        /* Если курс уже начали */
-                        else
-                        {
-                            var objCardStart = Instantiate(cardStart);
-                            StartCoroutine(LoadTextureFromServer(Path.Combine(folder.FullName, course.pathIcon), objCardStart, course));
-                            var infoCourse = objCardStart.transform.GetChild(1);
-                            infoCourse.GetChild(0).GetComponentInChildren<Text>().text = course.title;
-                            infoCourse.GetChild(1).GetChild(0).GetComponentInChildren<Text>().text = course.lessons.Count.ToString() + " уроков";
-                            infoCourse.GetChild(1).GetChild(1).GetComponentInChildren<Text>().text = myCourse.lessons.FindAll(x => x.finish).Count.ToString() + " уроков";
-                            objCardStart.transform.SetParent(content.transform, false);
-                            objCardStart.transform.GetChild(2).GetComponentInChildren<Button>().onClick.AddListener(
-                                () => { 
-                                    CurrentProfile.currentCourse = new MyCourse(course); 
-                                    /* Переход на другую сцену */
-                                });
-                            listCourse.Add(objCardStart);
-                        }
-                    }
-                    /* Если не было ещё такого курса */
-                    else
-                    {
-                        var objCardStart = Instantiate(cardNotStart);
-                        StartCoroutine(LoadTextureFromServer(Path.Combine(folder.FullName, course.pathIcon), objCardStart, course));
-                        var infoCourse = objCardStart.transform.GetChild(1);
-                        infoCourse.GetChild(0).GetComponentInChildren<Text>().text = course.title;
-                        infoCourse.GetChild(1).GetComponentInChildren<Text>().text = course.lessons.Count.ToString() + " уроков";
-                        objCardStart.transform.SetParent(content.transform, false);
-                        objCardStart.transform.GetChild(2).GetComponentInChildren<Button>().onClick.AddListener(() => OnClickButtonStart(course));
-                        listCourse.Add(objCardStart);
-                    }
+                    objCard = Instantiate(cardComplite);
+                    StartCoroutine(LoadTextureFromServer(course.pathIcon, objCard, course));
+                    var infoCourse = objCard.transform.GetChild(1);
+                    infoCourse.GetChild(0).GetComponentInChildren<Text>().text = course.title;
+                    infoCourse.GetChild(1).GetComponentInChildren<Text>().text = course.lessons.Count.ToString() + " уроков";
+                }
+                /* Если курс уже начали */
+                else
+                {
+                    objCard = Instantiate(cardStart);
+                    StartCoroutine(LoadTextureFromServer(course.pathIcon, objCard, course));
+                    var infoCourse = objCard.transform.GetChild(1);
+                    infoCourse.GetChild(0).GetComponentInChildren<Text>().text = course.title;
+                    infoCourse.GetChild(1).GetChild(0).GetComponentInChildren<Text>().text = course.lessons.Count.ToString() + " уроков";
+                    infoCourse.GetChild(1).GetChild(1).GetComponentInChildren<Text>().text = myCourse.lessons.FindAll(x => x.finish).Count.ToString() + " уроков";
                 }
             }
+            /* Если не было ещё такого курса */
+            else
+            {
+                objCard = Instantiate(cardNotStart);
+                StartCoroutine(LoadTextureFromServer(course.pathIcon, objCard, course));
+                var infoCourse = objCard.transform.GetChild(1);
+                infoCourse.GetChild(0).GetComponentInChildren<Text>().text = course.title;
+                infoCourse.GetChild(1).GetComponentInChildren<Text>().text = course.lessons.Count.ToString() + " уроков";
+                objCard.transform.GetChild(2).GetComponentInChildren<Button>().onClick.AddListener(() => objectProfiles.AddCourse(course));
+            }
+            objCard.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    CurrentProfile.currentCourse = new MyCourse(course);
+                    SceneManager.LoadScene("CourseDescription");
+                });
+                objCard.transform.GetChild(2).GetComponentInChildren<Button>().onClick.AddListener(() =>
+                            {
+                                CurrentProfile.currentCourse = new MyCourse(course);
+                                SceneManager.LoadScene("Course");
+                            });
+            objCard.transform.SetParent(content.transform, false);
+            listCourse.Add(objCard);
 
-        }
-        //Application.streamingAssetsPath;
+            }
         inputSearch.onValueChanged.AddListener((value) => FilterCard(value));
     }
     void Start()
     {
         icon.GetComponent<Image>().sprite = CurrentProfile.icon;
         icon.GetComponentInChildren<Text>().text = CurrentProfile.name;
-
     }
 
     private void FilterCard(string value)
     {
         var list = listCourse.FindAll(x => !x.transform.GetChild(1).GetChild(0).GetComponentInChildren<Text>().text.Contains(value, StringComparison.CurrentCultureIgnoreCase));
-        foreach (var item in listCourse)
-            item.SetActive(true);
-        foreach (var item in list)
-            item.SetActive(false);
+        listCourse.ForEach(x => x.SetActive(true));
+        list.ForEach(x => x.SetActive(false));
     }
 
-    IEnumerator LoadTextureFromServer(string url, GameObject objCardStart, Course course)
+    IEnumerator LoadTextureFromServer(string url, GameObject objCard, Course course)
     {
         var request = UnityWebRequestTexture.GetTexture(url);
         yield return request.SendWebRequest();
         var texture = DownloadHandlerTexture.GetContent(request);
-        course.icon = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
-        SetSprite(objCardStart, course);
+        SetSprite(objCard, texture, course);
         request.Dispose();
     }
-    private void SetSprite(GameObject objCardStart, Course course)
+    private void SetSprite(GameObject objCard, Texture2D texture, Course course)
     {
-        objCardStart.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = course.icon;
-    }
-
-    private void OnClickButtonStart(Course course)
-    {
-        objectProfiles.AddCourse(course);
-        CurrentProfile.currentCourse = new MyCourse(course);
-        /* Переход на другую сцену */
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Sprite sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
+        course.icon = sprite;
+        objCard.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = sprite;
     }
 }

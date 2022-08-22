@@ -8,16 +8,12 @@ public class MyCourse : Course
     public MyCourse(Course course)
     {
         title = course.title;
-
-        //lessons = course.lessons.Select(p => new MyLesson
-        //{
-        //    title = p.title,
-        //    description = p.description,
-        //    url = p.url
-        //}).ToList();
+        icon = course.icon;
+        description = course.description;
+        pathIcon = course.pathIcon;
 
         lessons = course.lessons.Select(p => new MyLesson(p)).ToList();
-
+        lastLesson = lessons.First();
         //lessons = new List<MyLesson>((IEnumerable<MyLesson>)course.lessons);
     }
 
