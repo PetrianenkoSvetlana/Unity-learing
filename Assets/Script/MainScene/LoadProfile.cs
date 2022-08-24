@@ -35,6 +35,7 @@ public class LoadProfile : MonoBehaviour
         objectProfiles.LoadData();
         //foreach (Transform child in content.transform)
         //    Destroy(child.gameObject);
+        //print(objectProfiles.Profiles);
         foreach (var profile in objectProfiles.Profiles)
         {
             var profileObj = Instantiate(prefabProfile);
