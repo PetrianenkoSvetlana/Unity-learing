@@ -1397,6 +1397,7 @@ MonoBehaviour:
   icon: {fileID: 1322599512}
   content: {fileID: 502031715}
   inputSearch: {fileID: 1055043324}
+  objectProfiles: {fileID: 11400000, guid: f4aaf2c0da9c10e4aaf0a502d2d858f7, type: 2}
 --- !u!1 &2062620746
 GameObject:
   m_ObjectHideFlags: 0

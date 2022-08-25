@@ -7,10 +7,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 
-
-
-
-
 public class CourseScene : MonoBehaviour
 {
     [Serializable]
@@ -24,24 +20,15 @@ public class CourseScene : MonoBehaviour
         public GameObject prefabCardCompleteLast;
     }
 
-    [SerializeField]
-    private Text titleCourse;
-    [SerializeField]
-    private GameObject icon;
-    [SerializeField]
-    private Lessons lessons;
-    [SerializeField]
-    private GameObject contentLessons;
-    [SerializeField]
-    private Text titleLesson;
-    [SerializeField]
-    private GameObject objVideoPlayer;
-    [SerializeField]
-    private VideoPlayer vPlayer;
-    [SerializeField]
-    private GameObject windowLoading;
-    [SerializeField]
-    private Text descriptionLesson;
+    [SerializeField] private Text titleCourse;
+    [SerializeField] private GameObject icon;
+    [SerializeField] private Lessons lessons;
+    [SerializeField] private GameObject contentLessons;
+    [SerializeField] private Text titleLesson;
+    [SerializeField] private GameObject objVideoPlayer;
+    [SerializeField] private VideoPlayer vPlayer;
+    [SerializeField] private GameObject windowLoading;
+    [SerializeField] private Text descriptionLesson;
 
     private void Awake()
     {
@@ -93,8 +80,6 @@ public class CourseScene : MonoBehaviour
 
         var lessonFirstUnfinish = CurrentProfile.currentCourse.lessons.Find(x => !x.finish);
         SelectCourse(lessonFirstUnfinish);
-        
-
     }
 
     public void SelectCourse(MyLesson lesson)

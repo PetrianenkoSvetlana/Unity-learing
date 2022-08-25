@@ -6,28 +6,18 @@ using UnityEngine.UI;
 
 public class CourseDescriptionScene : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject icon;
-    [SerializeField]
-    private Text titleCourse;
-    [SerializeField]
-    private Text descriptionCourse;
-    [SerializeField]
-    private Image iconCourse;
-    [SerializeField]
-    private GameObject content;
-    [SerializeField]
-    private GameObject prefabLesson;
-    [SerializeField]
-    private GameObject button;
-
-    private ObjectProfiles objectProfiles;
+    [SerializeField] private GameObject icon;
+    [SerializeField] private Text titleCourse;
+    [SerializeField] private Text descriptionCourse;
+    [SerializeField] private Image iconCourse;
+    [SerializeField] private GameObject content;
+    [SerializeField] private GameObject prefabLesson;
+    [SerializeField] private GameObject button;
+    [SerializeField] private ObjectProfiles objectProfiles;
     private Text textButton;
 
     private void Awake()
     {
-        objectProfiles = FindObjectOfType<ObjectProfiles>();
-
         textButton = button.GetComponentInChildren<Text>();
 
         icon.GetComponentInChildren<Image>().sprite = CurrentProfile.icon;

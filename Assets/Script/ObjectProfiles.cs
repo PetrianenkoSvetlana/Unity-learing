@@ -4,35 +4,31 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class ObjectProfiles : MonoBehaviour
+[CreateAssetMenu(fileName = "Data", menuName = "Data/Create Data", order = 51)]
+public class ObjectProfiles : ScriptableObject
 {
-    private string pathSaveData;
-    private List<Profile> profiles;
+    private string _pathSaveData;
+    [SerializeField] private List<Profile> _profiles;
 
-    public List<Profile> Profiles
-    {
-        get => profiles;
-    }
+    public List<Profile> Profiles => _profiles;
 
-
-    private void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-        pathSaveData = Application.persistentDataPath + "/SaveData.dat";
-        LoadData();
-    }
     /// <summary>
     /// Загрузка данных
     /// </summary>
     public void LoadData()
     {
-        if (File.Exists(pathSaveData))
-            using (FileStream file = File.Open(pathSaveData, FileMode.Open))
+        _pathSaveData = Application.persistentDataPath + "/SaveData.dat";
+        if (File.Exists(_pathSaveData))
+            using (FileStream file = File.Open(_pathSaveData, FileMode.Open))
             {
                 BinaryFormatter bf = new BinaryFormatter();
-                profiles = (List<Profile>)bf.Deserialize(file);
+                _profiles = (List<Profile>)bf.Deserialize(file);
                 file.Close();
             }
+        else
+        {
+            _profiles = new List<Profile>();
+        }
     }
     /// <summary>
     /// Добавляем профиль
@@ -40,7 +36,7 @@ public class ObjectProfiles : MonoBehaviour
     /// <param name="profile"></param>
     public void AddProfile(Profile profile)
     {
-        profiles.Add(profile);
+        _profiles.Add(profile);
         SaveData();
     }
     /// <summary>
@@ -48,30 +44,42 @@ public class ObjectProfiles : MonoBehaviour
     /// </summary>
     public void SaveData()
     {
-        using (FileStream file = File.Open(pathSaveData, FileMode.OpenOrCreate))
+        using (FileStream file = File.Open(_pathSaveData, FileMode.OpenOrCreate))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            bf.Serialize(file, profiles);
+            bf.Serialize(file, _profiles);
             file.Close();
         }
     }
+    /// <summary>
+    /// Добавление курса пользователю
+    /// </summary>
+    /// <param name="course">Курс</param>
     public void AddCourse(Course course)
     {
-        var profile = profiles.Find(x => x.Path == CurrentProfile.path);
+        var profile = _profiles.Find(x => x.Path == CurrentProfile.path);
         profile.Courses.Add(new MyCourse(course));
         SaveData();
     }
 
+    /// <summary>
+    /// Добавление курса пользователю
+    /// </summary>
+    /// <param name="course">Курс</param>
     public void AddCourse(MyCourse course)
     {
-        var profile = profiles.Find(x => x.Path == CurrentProfile.path);
+        var profile = _profiles.Find(x => x.Path == CurrentProfile.path);
         profile.Courses.Add(course);
         SaveData();
     }
 
+    /// <summary>
+    /// Удаление пользователя
+    /// </summary>
+    /// <param name="profile"></param>
     public void DeleteProfile(Profile profile)
     {
-        profiles.Remove(profile);
+        _profiles.Remove(profile);
         SaveData();
     }
 }

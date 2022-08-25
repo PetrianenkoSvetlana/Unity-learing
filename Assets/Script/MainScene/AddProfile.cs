@@ -23,11 +23,9 @@ public class AddProfile : MonoBehaviour
     public GameObject inputPath;
 
     [Space(10f)]
-    [SerializeField]
-    private ObjectProfiles objectProfiles;
+    [SerializeField] private ObjectProfiles objectProfiles;
     public Sprite[] icons;
-    [SerializeField]
-    private GameObject iconGameObject;
+    [SerializeField] private GameObject iconGameObject;
 
     private InputField textName;
     private InputField textEmail;
@@ -46,6 +44,7 @@ public class AddProfile : MonoBehaviour
     
         textPath.text = Application.streamingAssetsPath;
 
+        transform.GetChild(0).DOPunchScale(Vector3.one / 2, .5f, 1, 0);
     }
 
     /// <summary>
@@ -81,7 +80,6 @@ public class AddProfile : MonoBehaviour
             }
             else
                 Directory.CreateDirectory(CurrentProfile.path);
-
             SceneManager.LoadScene("AllСourses");
         }
     }
@@ -91,7 +89,7 @@ public class AddProfile : MonoBehaviour
     /// </summary>
     public void AddPath()
     {
-        var path = StandaloneFileBrowser.OpenFolderPanel("Выберить путь для сохрания ваших проектов", "", false);
+        var path = StandaloneFileBrowser.OpenFolderPanel("Выберить путь для сохрания ваших проектов", textPath.text, false);
         textPath.text = path.Length != 0 ? path[0] : textPath.text;
     }
 

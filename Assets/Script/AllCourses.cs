@@ -19,18 +19,13 @@ public class AllCourses : MonoBehaviour
     private GameObject cardComplite;
 
     [Space(10)]
-    [SerializeField]
-    private GameObject icon;
-    [SerializeField]
-    private GameObject content;
-    [SerializeField]
-    private InputField inputSearch;
-    private ObjectProfiles objectProfiles;
+    [SerializeField] private GameObject icon;
+    [SerializeField] private GameObject content;
+    [SerializeField] private InputField inputSearch;
+    [SerializeField] private ObjectProfiles objectProfiles;
     private readonly List<GameObject> listCourse = new List<GameObject>();
     private void Awake()
     {
-        objectProfiles = FindObjectOfType<ObjectProfiles>();
-
         DirectoryInfo dir = new DirectoryInfo(Path.Combine(Application.streamingAssetsPath, "Courses"));
         foreach (var (folder, file) in dir.GetDirectories().SelectMany(folder => folder.GetFiles().Where(file => file.Extension == ".json").Select(file => (folder, file))))
         {
