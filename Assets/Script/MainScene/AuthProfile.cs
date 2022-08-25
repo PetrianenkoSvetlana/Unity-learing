@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,21 +7,25 @@ using UnityEngine.UI;
 
 public class AuthProfile : MonoBehaviour
 {
-    [HideInInspector]
-    public Profile profile;
-    [HideInInspector]
-    public Sprite icon;
+    [SerializeField] private GameObject inputPassword;
+    [SerializeField] private int _vibrato;
+    [SerializeField] private int _elasticity;
 
-    [SerializeField]
-    private GameObject inputPassword;
-
-    private ObjectProfiles objectProfiles;
+    [HideInInspector] public Profile profile;
 
     private InputField textPassword;
+
+    //private void OnValidate()
+    //{
+    //    _elasticity = _elasticity < 0 ? 0 : _elasticity;
+    //    _elasticity = _elasticity > 1 ? 1 : _elasticity;
+    //}
+
     private void OnEnable()
     {
-        objectProfiles = FindObjectOfType<ObjectProfiles>();
         textPassword = inputPassword.GetComponentInChildren<InputField>();
+        textPassword.text = "";
+        transform.GetChild(0).DOPunchScale(Vector3.one / 2, .5f, 1, 0);
     }
 
     public void Auth()
@@ -32,14 +37,13 @@ public class AuthProfile : MonoBehaviour
         error |= inputPassword.GetComponent<CheckingInput>().Checking(hash.ToString() == profile.Password);
         if (!error)
         {
-            CurrentProfile.icon = icon;
+            CurrentProfile.icon = profile.Icon;
             CurrentProfile.name = profile.Name;
             CurrentProfile.password = profile.Password;
             CurrentProfile.email = profile.Email;
             CurrentProfile.path = profile.Path;
             CurrentProfile.courses = profile.Courses;
             SceneManager.LoadScene("ProfileCourses");
-            //SceneManager.LoadScene("ProfileCourses");
         }
 
     }
