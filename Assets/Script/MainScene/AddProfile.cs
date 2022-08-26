@@ -44,7 +44,7 @@ public class AddProfile : MonoBehaviour
     
         textPath.text = Application.streamingAssetsPath;
 
-        transform.GetChild(0).DOPunchScale(Vector3.one / 2, .5f, 1, 0);
+        transform.GetChild(0).DOPunchScale(Vector3.one / 10, .5f, 1, 0);
     }
 
     /// <summary>

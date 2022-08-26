@@ -25,7 +25,7 @@ public class AuthProfile : MonoBehaviour
     {
         textPassword = inputPassword.GetComponentInChildren<InputField>();
         textPassword.text = "";
-        transform.GetChild(0).DOPunchScale(Vector3.one / 2, .5f, 1, 0);
+        transform.GetChild(0).DOPunchScale(Vector3.one / 10, .5f, 1, 0);
     }
 
     public void Auth()
